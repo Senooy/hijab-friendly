@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { auth, provider } from '../firebaseConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { Button, VStack, Heading, Text, Spinner, Input, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 function Login() {
+  
   const [isSignIn, setIsSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [captchaValue, setCaptchaValue] = useState(''); 
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -25,9 +28,13 @@ function Login() {
   };
 
   const handleSubmit = () => {
-    // Traiter la connexion ou l'inscription
-    // Pour l'inscription, vérifiez d'abord si le mot de passe et confirmPassword correspondent.
-  };
+    if (!captchaValue) {
+      setErrorMessage('Veuillez confirmer que vous n\'êtes pas un robot.');
+      return;
+    }
+};
+
+
 
   return (
     <VStack spacing={6} mt={16} width="100%" maxWidth="400px" margin="auto">
@@ -67,6 +74,11 @@ function Login() {
         </FormControl>
       )}
 
+<ReCAPTCHA
+        sitekey="YOUR_RECAPTCHA_SITE_KEY" // Remplace par ta clé d'API
+        onChange={(value) => setCaptchaValue(value)}
+      />
+
       {isLoading ? (
         <Spinner size="xl" />
       ) : (
@@ -83,5 +95,6 @@ function Login() {
     </VStack>
   );
 }
+
 
 export default Login;
