@@ -17,6 +17,22 @@ function Login() {
     setCaptchaValue(value);
 };
 
+const isValidEmail = (email) => {
+  const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return regex.test(email);
+};
+
+const isValidPassword = (password) => {
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return regex.test(password);
+};
+
+const passwordsMatch = (password, confirmPassword) => {
+  return password === confirmPassword;
+};
+
+
+
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -32,11 +48,31 @@ function Login() {
   };
 
   const handleSubmit = () => {
+    // Vérification du reCAPTCHA
     if (!captchaValue) {
       setErrorMessage('Veuillez confirmer que vous n\'êtes pas un robot.');
       return;
     }
-};
+    
+    // Validation de l'email
+    if (!isValidEmail(email)) {
+      setErrorMessage('L\'email est invalide.');
+      return;
+    }
+    
+    // Validation du mot de passe
+    if (!isValidPassword(password)) {
+      setErrorMessage('Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.');
+      return;
+    }
+    
+    // Vérification de la correspondance des mots de passe en mode inscription
+    if (!isSignIn && !passwordsMatch(password, confirmPassword)) {
+      setErrorMessage('Les mots de passe ne correspondent pas.');
+      return;
+    }
+  };
+    
 
 
 
