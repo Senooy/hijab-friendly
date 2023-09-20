@@ -13,6 +13,10 @@ function Login() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [captchaValue, setCaptchaValue] = useState(''); 
+  const handleCaptchaResponse = (value) => {
+    setCaptchaValue(value);
+};
+
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -74,10 +78,12 @@ function Login() {
         </FormControl>
       )}
 
-<ReCAPTCHA
-        sitekey="YOUR_RECAPTCHA_SITE_KEY" // Remplace par ta clé d'API
-        onChange={(value) => setCaptchaValue(value)}
+      <ReCAPTCHA
+    sitekey={process.env.REACT_APP_GOOGLE_RECAPTCHA_KEY}
+    onChange={handleCaptchaResponse}
       />
+
+      
 
       {isLoading ? (
         <Spinner size="xl" />
