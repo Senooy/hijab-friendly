@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
-import { Button, FormControl, FormLabel, Input, VStack, Textarea, Select, Box, HStack, Heading } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, Input, 
+VStack, Textarea, Select, Box, HStack, Heading, useBreakpointValue } from '@chakra-ui/react';
 
 function AddCompany() {
     const [name, setName] = useState('');
@@ -55,64 +56,83 @@ function AddCompany() {
     }
   };
 
-  return (
-    <VStack spacing={4} width="100%" maxWidth="600px" margin="auto">
-      <Heading as="h2">Ajouter une entreprise</Heading>
-      
-      <FormControl>
-        <FormLabel>Nom de l'entreprise</FormLabel>
-        <Input value={name} onChange={(e) => setName(e.target.value)} />
-      </FormControl>
+    // Ajustez l'espacement en fonction de la taille de l'écran
+    const stackSpacing = useBreakpointValue({ base: 2, md: 4 });
 
-      <HStack spacing={4} width="100%">
-        <FormControl flex="1">
-          <FormLabel>Adresse</FormLabel>
-          <Input value={address} onChange={(e) => setAddress(e.target.value)} />
-        </FormControl>
-        <FormControl flex="1">
-          <FormLabel>Code postal</FormLabel>
-          <Input value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
-        </FormControl>
-      </HStack>
+    // Ajustez la disposition des champs Adresse et Code postal en fonction de la taille de l'écran
+    const addressLayout = useBreakpointValue({ base: "VStack", md: "HStack" });
 
-      <FormControl>
-        <FormLabel>Ville</FormLabel>
-        <Input value={city} onChange={(e) => setCity(e.target.value)} />
-      </FormControl>
+    return (
+        <VStack spacing={stackSpacing} width="100%" maxWidth="600px" margin="auto" p={{ base: "4", md: "0" }}>
+            <Heading as="h2">Ajouter une entreprise</Heading>
+            
+            <FormControl>
+                <FormLabel>Nom de l'entreprise</FormLabel>
+                <Input value={name} onChange={(e) => setName(e.target.value)} />
+            </FormControl>
 
-      <FormControl>
-        <FormLabel>Politique sur le port du voile</FormLabel>
-        <Select value={policy} onChange={(e) => setPolicy(e.target.value)}>
-          <option value="accepted">Accepté</option>
-          <option value="notAccepted">Non accepté</option>
-          <option value="noInfo">Pas d'information</option>
-        </Select>
-      </FormControl>
+            {addressLayout === "HStack" ? (
+                <HStack spacing={4} width="100%">
+                    <FormControl flex="1">
+                        <FormLabel>Adresse</FormLabel>
+                        <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+                    </FormControl>
+                    <FormControl flex="1">
+                        <FormLabel>Code postal</FormLabel>
+                        <Input value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
+                    </FormControl>
+                </HStack>
+            ) : (
+                <VStack spacing={4} width="100%">
+                    <FormControl>
+                        <FormLabel>Adresse</FormLabel>
+                        <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Code postal</FormLabel>
+                        <Input value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
+                    </FormControl>
+                </VStack>
+            )}
 
-      <FormControl>
-        <FormLabel>Commentaires / Témoignages</FormLabel>
-        <Textarea value={comments} onChange={(e) => setComments(e.target.value)} />
-      </FormControl>
+            <FormControl>
+                <FormLabel>Ville</FormLabel>
+                <Input value={city} onChange={(e) => setCity(e.target.value)} />
+            </FormControl>
 
-      <HStack spacing={4} width="100%">
-        <FormControl flex="1">
-          <FormLabel>Email de contact (entreprise)</FormLabel>
-          <Input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
-        </FormControl>
-        <FormControl flex="1">
-          <FormLabel>Téléphone de contact (entreprise)</FormLabel>
-          <Input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
-        </FormControl>
-      </HStack>
+            <FormControl>
+                <FormLabel>Politique sur le port du voile</FormLabel>
+                <Select value={policy} onChange={(e) => setPolicy(e.target.value)}>
+                    <option value="accepted">Accepté</option>
+                    <option value="notAccepted">Non accepté</option>
+                    <option value="noInfo">Pas d'information</option>
+                </Select>
+            </FormControl>
 
-      <FormControl>
-        <FormLabel>Date de la dernière mise à jour</FormLabel>
-        <Input type="date" value={lastUpdate} onChange={(e) => setLastUpdate(e.target.value)} />
-      </FormControl>
+            <FormControl>
+                <FormLabel>Commentaires / Témoignages</FormLabel>
+                <Textarea value={comments} onChange={(e) => setComments(e.target.value)} />
+            </FormControl>
 
-      <Button colorScheme="blue" onClick={handleSubmit}>Ajouter</Button>
-    </VStack>
-  );
+            <HStack spacing={4} width="100%">
+                <FormControl flex="1">
+                    <FormLabel>Email de contact (entreprise)</FormLabel>
+                    <Input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+                </FormControl>
+                <FormControl flex="1">
+                    <FormLabel>Téléphone de contact (entreprise)</FormLabel>
+                    <Input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
+                </FormControl>
+            </HStack>
+
+            <FormControl>
+                <FormLabel>Date de la dernière mise à jour</FormLabel>
+                <Input type="date" value={lastUpdate} onChange={(e) => setLastUpdate(e.target.value)} />
+            </FormControl>
+
+            <Button colorScheme="blue" onClick={handleSubmit}>Ajouter</Button>
+        </VStack>
+    );
 }
 
 export default AddCompany;
