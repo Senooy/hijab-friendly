@@ -68,16 +68,27 @@ function Home() {
       {/* Grille des entreprises */}
       <Grid templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(3, 1fr)", lg: "repeat(6, 1fr)" }} gap={4} width="100%">
         {filteredCompanies.map((company, index) => (
-          <GridItem key={index} bg="white" padding={2} borderRadius="md" boxShadow="sm" height="auto">
-            <VStack align="start" spacing={2}>
-              <Text fontWeight="bold">{company.name}</Text>
-              <Text>{company.address}</Text>
-              <Text>{company.city}, {company.zipCode}</Text>
-              <Text>{company.policy === "accepted" ? "Accepte le voile" : "N'accepte pas le voile"}</Text>
-              <Text>Email: {company.contactEmail}</Text>
-              <Text>Tél: {company.contactPhone}</Text>
-            </VStack>
-          </GridItem>
+          <GridItem 
+              key={index} 
+              bg="gray.50"  // Couleur de fond légèrement grise
+              padding={4}   // Augmenter le padding pour un meilleur aspect
+              borderRadius="md" 
+              boxShadow="md"  // Ombre plus prononcée
+              border="1px solid" 
+              borderColor="gray.200"  // Bordure légère
+              height="auto"
+             _hover={{ boxShadow: "lg" }}  // Ombre plus grande au survol pour un effet interactif
+>
+  <VStack align="start" spacing={3}>  // Espacement augmenté pour une meilleure lisibilité
+    <Text fontWeight="bold">{company.name}</Text>
+    <Text>{company.address}</Text>
+    <Text>{company.city}, {company.zipCode}</Text>
+    <Text>{company.policy === "accepted" ? "Accepte le voile" : "N'accepte pas le voile"}</Text>
+    <Text>Email: {company.contactEmail}</Text>
+    <Text>Tél: {company.contactPhone}</Text>
+  </VStack>
+</GridItem>
+
         ))}
       </Grid>
     </Box>
