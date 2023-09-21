@@ -54,7 +54,7 @@ function Header() {
     const displayType = useBreakpointValue({ base: "mobile", md: "desktop" });
 
     return (
-      <Flex as="header" justifyContent="space-between" alignItems="center" padding={4} bg="macchiato.peach" color="white">
+      <Flex as="header" justifyContent="space-between" alignItems="center" padding={4} bg="macchiato.peach" color="white" marginBottom="4">
         {/* Logo */}
         <RouterLink to="/">
           <Text fontSize="xl" fontWeight="bold">

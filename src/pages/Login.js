@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { auth, provider } from '../firebaseConfig';
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { Button, Icon, VStack, Heading, Text, Spinner, Input, FormControl, FormLabel, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react';
+import { Button, Icon, VStack, Heading, Text, Spinner, Input, 
+  FormControl, FormLabel, Modal, ModalOverlay, ModalContent, 
+  ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, useBreakpointValue } from '@chakra-ui/react';
 import ReCAPTCHA from "react-google-recaptcha";
 import { FaGoogle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -94,8 +96,13 @@ function Login() {
     }
   };
 
+  // Utiliser useBreakpointValue pour définir des valeurs en fonction de la taille de l'écran
+  const stackSpacing = useBreakpointValue({ base: 4, md: 6 });
+  const marginTop = useBreakpointValue({ base: 8, md: 16 });
+  const maxWidth = useBreakpointValue({ base: "90%", md: "400px" });
+
   return (
-    <VStack spacing={6} mt={16} width="100%" maxWidth="400px" margin="auto">
+    <VStack spacing={stackSpacing} mt={marginTop} width="100%" maxWidth={maxWidth} margin="auto">
       <Heading as="h1">{isSignIn ? "Connexion" : "Inscription"}</Heading>
 
       {errorMessage && <Text color="red.500">{errorMessage}</Text>}
