@@ -1,21 +1,37 @@
-import React from "react";
-import { Box, Text, Input, List, ListItem, Image, Button } from "@chakra-ui/react"; 
+import React, { useState, useEffect } from "react";
+import { Box, Text, Input, Image, Button, Grid, GridItem, VStack } from "@chakra-ui/react"; 
 import { useNavigate } from "react-router-dom";
-
-
-
+import { db } from "../firebaseConfig"; // Assurez-vous que ce chemin est correct
+import { collection, getDocs } from "firebase/firestore";
 
 function Home() {
-  // Données fictives pour les entreprises
-  const companies = [
-    { name: "Entreprise A", acceptsHijab: true },
-    { name: "Entreprise B", acceptsHijab: false },
-    { name: "Entreprise C", acceptsHijab: true },
-    // ... ajoute autant d'entreprises que nécessaire
-  ];
-
+  const [companies, setCompanies] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
   const navigate = useNavigate();
-  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const companyCollection = collection(db, "companies");
+      const companySnapshot = await getDocs(companyCollection);
+      const companyList = companySnapshot.docs.map(doc => doc.data());
+      setCompanies(companyList);
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (searchValue.length >= 3) {
+      const results = companies.filter(company =>
+        company.name.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      setFilteredCompanies(results);
+    } else {
+      setFilteredCompanies(companies);
+    }
+  }, [searchValue, companies]);
+
   return (
     <Box 
       display="flex"
@@ -35,7 +51,13 @@ function Home() {
       </Text>
 
       {/* Champ de recherche */}
-      <Input placeholder="Rechercher une entreprise..." marginBottom={4} width="80%" />
+      <Input 
+        placeholder="Rechercher une entreprise..." 
+        marginBottom={4} 
+        width="80%" 
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+      />
 
       {/* Bouton pour ajouter une entreprise */}
       <Button marginBottom={4} colorScheme="blue" onClick={() => navigate("/add-company")}>
@@ -43,14 +65,21 @@ function Home() {
      </Button>
 
 
-      {/* Liste des entreprises */}
-      <List width="80%" spacing={3}>
-        {companies.map((company, index) => (
-          <ListItem key={index} padding={2} borderRadius="md" boxShadow="sm" bg="white">
-            {company.name} - {company.acceptsHijab ? "Accepte le voile" : "N'accepte pas le voile"}
-          </ListItem>
+      {/* Grille des entreprises */}
+      <Grid templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(3, 1fr)", lg: "repeat(6, 1fr)" }} gap={4} width="100%">
+        {filteredCompanies.map((company, index) => (
+          <GridItem key={index} bg="white" padding={2} borderRadius="md" boxShadow="sm" height="auto">
+            <VStack align="start" spacing={2}>
+              <Text fontWeight="bold">{company.name}</Text>
+              <Text>{company.address}</Text>
+              <Text>{company.city}, {company.zipCode}</Text>
+              <Text>{company.policy === "accepted" ? "Accepte le voile" : "N'accepte pas le voile"}</Text>
+              <Text>Email: {company.contactEmail}</Text>
+              <Text>Tél: {company.contactPhone}</Text>
+            </VStack>
+          </GridItem>
         ))}
-      </List>
+      </Grid>
     </Box>
   );
 }

@@ -64,7 +64,9 @@ function Header() {
 
         {displayType === "desktop" ? (
           <Flex alignItems="center">
+            <RouterLink to="/">
             <Link marginX={2}>Accueil</Link>
+            </RouterLink>
             <Link marginX={2}>À propos</Link>
             <Link marginX={2}>Contact</Link>
             {isUserLoggedIn ? (
