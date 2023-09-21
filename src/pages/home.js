@@ -1,5 +1,9 @@
 import React from "react";
 import { Box, Text, Input, List, ListItem, Image, Button } from "@chakra-ui/react"; 
+import { useNavigate } from "react-router-dom";
+
+
+
 
 function Home() {
   // Données fictives pour les entreprises
@@ -10,6 +14,8 @@ function Home() {
     // ... ajoute autant d'entreprises que nécessaire
   ];
 
+  const navigate = useNavigate();
+  
   return (
     <Box 
       display="flex"
@@ -32,9 +38,10 @@ function Home() {
       <Input placeholder="Rechercher une entreprise..." marginBottom={4} width="80%" />
 
       {/* Bouton pour ajouter une entreprise */}
-      <Button marginBottom={4} colorScheme="blue" onClick={() => { /* code pour ajouter une entreprise */ }}>
-        Ajouter une entreprise
-      </Button>
+      <Button marginBottom={4} colorScheme="blue" onClick={() => navigate("/add-company")}>
+       Ajouter une entreprise
+     </Button>
+
 
       {/* Liste des entreprises */}
       <List width="80%" spacing={3}>

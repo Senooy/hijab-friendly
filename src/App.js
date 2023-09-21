@@ -1,7 +1,9 @@
 import './App.css';
-import React from 'react';
+import { React, useContext } from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AuthProvider from './AuthProvider';
+import AuthContext from './AuthContext'; // Remplacez 'path-to-your-AuthContext-file' par le chemin relatif vers votre fichier AuthContext
 import theme from './theme';
 import Home from './pages/home.js';
 import Header from './components/header';
@@ -12,6 +14,7 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       <Router>
+      <AuthProvider>
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -22,16 +25,18 @@ function App() {
             </PrivateWrapper>
           } />
         </Routes>
+        </AuthProvider>
       </Router>
+      
     </ChakraProvider>
   );
 }
 
 
 function PrivateWrapper({ children }) {
-  const isAuthenticated = false; // Remplace cela par ta logique d'authentification
+  const { isUserLoggedIn } = useContext(AuthContext); // Utilisez le contexte d'authentification
 
-  if (!isAuthenticated) {
+  if (!isUserLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 

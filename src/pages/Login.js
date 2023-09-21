@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { auth, provider } from '../firebaseConfig';
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import AuthContext from '../AuthContext';
 import { Button, Icon, VStack, Heading, Text, Spinner, Input, 
   FormControl, FormLabel, Modal, ModalOverlay, ModalContent, 
   ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, useBreakpointValue } from '@chakra-ui/react';
@@ -9,7 +10,7 @@ import { FaGoogle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
-  
+  const { user, isUserLoggedIn, setUser, setIsUserLoggedIn } = useContext(AuthContext);
   const [isSignIn, setIsSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -38,19 +39,22 @@ function Login() {
     return password === confirmPassword;
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log(result.user);
-      onOpen();
-    } catch (error) {
-      console.error(error);
-      setErrorMessage(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ // Mettez à jour l'état de connexion après une connexion réussie :
+ const handleGoogleSignIn = async () => {
+  setIsLoading(true);
+  try {
+    const result = await signInWithPopup(auth, provider);
+    console.log(result.user);
+    setUser(result.user);
+    setIsUserLoggedIn(true);
+    onOpen();
+  } catch (error) {
+    console.error(error);
+    setErrorMessage(error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleSubmit = async () => {
     // Vérification du reCAPTCHA
