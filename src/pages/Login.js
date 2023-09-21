@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { auth, provider } from '../firebaseConfig';
-import { signInWithPopup } from 'firebase/auth';
-import { Button, VStack, Heading, Text, Spinner, Input, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { Button, Icon, VStack, Heading, Text, Spinner, Input, FormControl, FormLabel, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react';
 import ReCAPTCHA from "react-google-recaptcha";
+import { FaGoogle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   
@@ -13,41 +15,42 @@ function Login() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [captchaValue, setCaptchaValue] = useState(''); 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+
   const handleCaptchaResponse = (value) => {
     setCaptchaValue(value);
-};
+  };
 
-const isValidEmail = (email) => {
-  const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  return regex.test(email);
-};
+  const isValidEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regex.test(email);
+  };
 
-const isValidPassword = (password) => {
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return regex.test(password);
-};
+  const isValidPassword = (password) => {
+    const regex = /^(?=.*[a-zA-Z]).{8,}$/;
+    return regex.test(password);
+  };
 
-const passwordsMatch = (password, confirmPassword) => {
-  return password === confirmPassword;
-};
-
-
-
+  const passwordsMatch = (password, confirmPassword) => {
+    return password === confirmPassword;
+  };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
       console.log(result.user);
+      onOpen();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setErrorMessage(error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Vérification du reCAPTCHA
     if (!captchaValue) {
       setErrorMessage('Veuillez confirmer que vous n\'êtes pas un robot.');
@@ -62,7 +65,7 @@ const passwordsMatch = (password, confirmPassword) => {
     
     // Validation du mot de passe
     if (!isValidPassword(password)) {
-      setErrorMessage('Le mot de passe doit contenir au moins 8 caractères, dont une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.');
+      setErrorMessage('Le mot de passe doit contenir au moins 8 caractères, dont une lettre.');
       return;
     }
     
@@ -71,10 +74,25 @@ const passwordsMatch = (password, confirmPassword) => {
       setErrorMessage('Les mots de passe ne correspondent pas.');
       return;
     }
+
+    setIsLoading(true);
+    try {
+        if (isSignIn) {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            console.log("Utilisateur connecté:", userCredential.user);
+            onOpen();
+        } else {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            console.log("Utilisateur inscrit:", userCredential.user);
+            onOpen();
+        }
+    } catch (error) {
+        console.error("Erreur:", error);
+        setErrorMessage(error.message);
+    } finally {
+        setIsLoading(false);
+    }
   };
-    
-
-
 
   return (
     <VStack spacing={6} mt={16} width="100%" maxWidth="400px" margin="auto">
@@ -115,11 +133,9 @@ const passwordsMatch = (password, confirmPassword) => {
       )}
 
       <ReCAPTCHA
-    sitekey={process.env.REACT_APP_GOOGLE_RECAPTCHA_KEY}
-    onChange={handleCaptchaResponse}
+        sitekey={process.env.REACT_APP_GOOGLE_RECAPTCHA_KEY}
+        onChange={handleCaptchaResponse}
       />
-
-      
 
       {isLoading ? (
         <Spinner size="xl" />
@@ -128,15 +144,35 @@ const passwordsMatch = (password, confirmPassword) => {
           <Button width="100%" onClick={handleSubmit}>
             {isSignIn ? "Se connecter" : "S'inscrire"}
           </Button>
-          <Button width="100%" onClick={handleGoogleSignIn}>Se connecter avec Google</Button>
+          <Button width="100%" onClick={handleGoogleSignIn} leftIcon={<Icon as={FaGoogle} boxSize={5} />}>
+            Se connecter avec Google
+          </Button>
           <Button width="100%" variant="link" onClick={() => setIsSignIn(!isSignIn)}>
             {isSignIn ? "Pas encore inscrit ? S'inscrire" : "Déjà inscrit ? Se connecter"}
           </Button>
+          
+          <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Inscription réussie !</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Félicitations, votre inscription a été effectuée avec succès.
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" onClick={() => {
+              onClose();
+              navigate('/');
+            }}>
+              Retour à l'accueil
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
         </>
       )}
     </VStack>
   );
 }
-
 
 export default Login;
